@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ripple-container {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.3s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+input::placeholder {
+    color: #000000;
+    font-weight: 300;
+}
+
+.loader {
+    border: 3px solid #228B22;
+    /* Light border */
+    border-top: 3px solid white;
+    /* Top border for the spinning effect */
+    border-radius: 50%;
+    width: 16px;
+    /* Size of the loader */
+    height: 16px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.custom-gradient-border {
+    background: conic-gradient(from 0deg, #228B22, #32CD32);
+}
