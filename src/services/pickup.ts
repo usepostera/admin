@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useAppSelector } from "../store/store";
 import instance from "../lib/axiosInstance";
-import { PickupRequestInput, TPickupRequest } from "../@types";
+import { TPickupRequest } from "../@types";
 
 export const usePickupService = () => {
   const token = useAppSelector((state) => state.auth.token);
@@ -10,14 +10,19 @@ export const usePickupService = () => {
     return instance(token ?? undefined);
   }, [token]);
 
-  const requestNewPickup = useCallback(
+  const getPickups = useCallback(
     async (
-      data: PickupRequestInput & { recyclable: string }
-    ): Promise<TPickupRequest> => {
-      return (await axiosInstance.post("/pickup", data)).data;
+      page = 1
+    ): Promise<{
+      data: TPickupRequest[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }> => {
+      return (await axiosInstance.get(`/pickup?page=${page}&limit=20`)).data;
     },
     [axiosInstance]
   );
 
-  return { requestNewPickup };
+  return { getPickups };
 };

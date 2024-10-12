@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/Auth";
 import AuthWrapper from "./components/AuthWrapper";
 import AppWrapper from "./components/AppWrapper";
 import { Toaster } from "react-hot-toast";
+import PickupRequestPage from "./pages/PickupRequest";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route element={<AppWrapper />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/pickups" element={<PickupRequestPage />} />
           </Route>
 
           <Route element={<AuthWrapper />}>

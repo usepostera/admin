@@ -18,7 +18,7 @@ export const OutlinedButton = (
     <RippleEffect
       onClick={onClick}
       className={`
-        rounded-[6px] h-[40px] py-[13px] px-[12px] w-full flex justify-center items-center bg-transparent border-[1px] border-black
+        rounded-[6px] h-[40px] py-[13px] px-[16px] w-full flex justify-center items-center bg-transparent border-[1px] border-[#228B22]
         ${disabled ? "cursor-not-allowed" : ""}
         ${loading ? "cursor-wait" : ""}
         ${className}
@@ -35,7 +35,7 @@ export const OutlinedButton = (
           )}
           {prefixIcon && prefixIcon}
           <p
-            className={`text-[16px] leading-[24px] text-black font-montserrat font-normal`}
+            className={`text-[16px] leading-[24px] text-[#228B22] font-montserrat font-normal`}
           >
             {label}
           </p>
