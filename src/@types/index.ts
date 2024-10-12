@@ -40,14 +40,14 @@ export type PickupRequestInput = {
   addressId: string;
 };
 
-export type AddressInput = {
-  addressType: UserAddressType | "";
-  address: string;
-};
-
 export type LoginResponse = {
   message: string;
   token: string;
+};
+
+export type TMetric = {
+  title: string;
+  value: number;
 };
 
 export enum RecyclableUnit {

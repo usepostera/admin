@@ -1,0 +1,30 @@
+.loader {
+    border: 4px solid #228B224d;
+    /* light green */
+    border-left-color: #228B22;
+    /* darker green */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1.2s linear infinite;
+}
+
+.inner-circle {
+    width: 80%;
+    height: 80%;
+    background-color: #228B224d;
+    border-radius: 50%;
+    margin: auto;
+    position: relative;
+    top: 10%;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

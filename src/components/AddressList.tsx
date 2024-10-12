@@ -1,5 +1,4 @@
 import React from "react";
-import { useUserAddress } from "../hooks/useUserAddress";
 import SimpleAnimatedComponent from "./SimpleAnimatedComponent";
 import { TUserAddress } from "../@types";
 import Checkbox from "./Checkbox";
@@ -12,7 +11,8 @@ type Props = {
 
 const AddressList: React.FC<Props> = (props) => {
   const { onSelect, selected } = props;
-  const { adddresses, loading } = useUserAddress();
+  const adddresses: TUserAddress[] = [];
+  const loading = false;
 
   return (
     <SimpleAnimatedComponent className="w-full">
