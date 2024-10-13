@@ -104,3 +104,16 @@ export type LoginVerificationData = {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type OutlinedButtonProps = {};
+
+export enum NotificationAction {
+  acceptMeasuredUnit,
+}
+
+export type TNotification = {
+  _id: string;
+  message: string;
+  action: NotificationAction | null;
+  refId: string | null;
+  createdAt: string;
+  action_complete: boolean;
+};

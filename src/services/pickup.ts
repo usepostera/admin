@@ -50,5 +50,19 @@ export const usePickupService = () => {
     [axiosInstance]
   );
 
-  return { getPickups, getPickupById, acceptPickup, requestCompletePickup };
+  const closePickup = useCallback(
+    async (id: string): Promise<{ message: string; data: TPickupRequest }> => {
+      const res = await axiosInstance.post(`/pickup/${id}/complete`);
+      return res.data;
+    },
+    [axiosInstance]
+  );
+
+  return {
+    getPickups,
+    getPickupById,
+    acceptPickup,
+    requestCompletePickup,
+    closePickup,
+  };
 };

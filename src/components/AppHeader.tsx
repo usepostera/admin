@@ -15,6 +15,7 @@ import { IoIosMenu } from "react-icons/io";
 
 const pathnameMapping: { [key: string]: string } = {
   "/": "Home",
+  "/notifications": "Notifications",
 };
 
 const AppHeader = () => {

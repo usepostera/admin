@@ -20,7 +20,8 @@ const PickupRequestDetail: React.FC = () => {
   const [date, setDate] = useState("");
   const [size, setSize] = useState("");
 
-  const { acceptPickup, requestCompletePickup } = usePickupService();
+  const { acceptPickup, requestCompletePickup, closePickup } =
+    usePickupService();
 
   const { trigger, loading: accepting } = useRequestHandler(acceptPickup);
   const httpAcceptPickup = useCallback(async () => {
@@ -54,6 +55,18 @@ const PickupRequestDetail: React.FC = () => {
     [size, id, triggerRequestComplete, reloadPickup]
   );
 
+  const { trigger: triggerClose, loading: closing } =
+    useRequestHandler(closePickup);
+
+  const handleClosePickup = useCallback(async () => {
+    if (!id) return;
+    const result = await triggerClose(id);
+    if (result) {
+      toast.success(result.message);
+      reloadPickup(result.data);
+    }
+  }, [id, reloadPickup, triggerClose]);
+
   if (loadingPickup) {
     return <Loader size={30} />;
   }
@@ -63,6 +76,17 @@ const PickupRequestDetail: React.FC = () => {
       <div className="flex-1">
         <p className="text-[18px] leading-[24px] mb-2">Pickups details</p>
         {id && <PickupDetails pickup={pickup} />}
+
+        {pickup?.status === PickupRequestStatus.processing && (
+          <SimpleAnimatedComponent className="md:max-w-[388px] delay-300 my-4">
+            <Button.Contained
+              label="Mark as Complete"
+              type="button"
+              onClick={handleClosePickup}
+              loading={closing}
+            />
+          </SimpleAnimatedComponent>
+        )}
       </div>
 
       <div className="flex-1">

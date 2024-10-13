@@ -3,11 +3,14 @@ import NavItem from "./NavLink";
 
 import HomeIcon from "../assets/svgs/home_icon.svg";
 import TruckIcon from "../assets/svgs/truck.svg";
+import NotificationIcon from "../assets/svgs/notification.svg";
+
 import { useLocation } from "react-router-dom";
 
 const LOCATION_MAPPINGS = {
   home: "/",
   pickup: "/pickups",
+  notification: "/notifications",
 };
 
 const AppSidebar = () => {
@@ -30,6 +33,15 @@ const AppSidebar = () => {
               isActive={pathname === LOCATION_MAPPINGS.home}
               route="/"
               Icon={HomeIcon}
+            />
+          </li>
+
+          <li>
+            <NavItem
+              label="Notifications"
+              route="/notifications"
+              Icon={NotificationIcon}
+              isActive={pathname.startsWith(LOCATION_MAPPINGS.notification)}
             />
           </li>
 

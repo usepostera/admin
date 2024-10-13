@@ -6,6 +6,7 @@ import AppWrapper from "./components/AppWrapper";
 import { Toaster } from "react-hot-toast";
 import PickupRequestPage from "./pages/PickupRequest";
 import PickupRequestDetailPage from "./pages/PickupRequestDetail";
+import NotificationPage from "./pages/Notification";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route element={<AppWrapper />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/notifications" element={<NotificationPage />} />
             <Route path="/pickups" element={<PickupRequestPage />} />
             <Route path="/pickups/:id" element={<PickupRequestDetailPage />} />
           </Route>
