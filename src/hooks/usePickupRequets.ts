@@ -3,11 +3,11 @@ import { useRequestHandler } from "./useRequestHandler";
 import { usePickupService } from "../services/pickup";
 import { TPickupRequest } from "../@types";
 
-export const usePickupRequets = () => {
+export const usePickupRequets = (id: string | undefined) => {
   const [totalPages, setTotalPages] = useState(1);
   const [pickups, setPickups] = useState<TPickupRequest[]>([]);
 
-  const { getPickups } = usePickupService();
+  const { getPickups, getPickupById } = usePickupService();
   const { trigger, loading } = useRequestHandler(getPickups);
 
   const httpFetchPickups = useCallback(
@@ -42,10 +42,41 @@ export const usePickupRequets = () => {
     return reset;
   }, []);
 
+  const [data, setData] = useState<TPickupRequest | null>(null);
+  const { trigger: triggerPickupById, loading: loadingPickup } =
+    useRequestHandler(getPickupById);
+
+  const reloadPickup = useCallback((data: TPickupRequest) => {
+    setData(data);
+  }, []);
+
+  const httpFetchPickup = useCallback(
+    async (id: string) => {
+      const result = await triggerPickupById(id);
+      if (result) {
+        setData(result);
+      }
+    },
+    [triggerPickupById]
+  );
+
+  useEffect(() => {
+    if (id) {
+      httpFetchPickup(id);
+    }
+
+    return () => {
+      setData(null);
+    };
+  }, [httpFetchPickup, id]);
+
   return {
     loading,
     pickups,
     loadPage,
+    reloadPickup,
     totalPages,
+    pickup: data,
+    loadingPickup,
   };
 };

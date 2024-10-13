@@ -93,6 +93,8 @@ export type TPickupRequest = {
   createdAt: string;
   updatedAt: string;
   requested_by: string;
+  measured_weight_confirmed: boolean;
+  picked_up: boolean;
 };
 
 export type LoginVerificationData = {

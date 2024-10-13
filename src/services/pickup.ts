@@ -24,5 +24,31 @@ export const usePickupService = () => {
     [axiosInstance]
   );
 
-  return { getPickups };
+  const getPickupById = useCallback(
+    async (id: string) => {
+      const res = await axiosInstance.get(`/pickup/${id}`);
+      return res.data;
+    },
+    [axiosInstance]
+  );
+
+  const acceptPickup = useCallback(
+    async (id: string, date: string) => {
+      const res = await axiosInstance.post(`/pickup/${id}/accept`, { date });
+      return res.data;
+    },
+    [axiosInstance]
+  );
+
+  const requestCompletePickup = useCallback(
+    async (id: string, size: number) => {
+      const res = await axiosInstance.post(`/pickup/${id}/complete-request`, {
+        size,
+      });
+      return res.data;
+    },
+    [axiosInstance]
+  );
+
+  return { getPickups, getPickupById, acceptPickup, requestCompletePickup };
 };
