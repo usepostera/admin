@@ -31,7 +31,7 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <Loader />
+          <Loader size={30} />
         ) : (
           <div className="flex flex-row gap-6 flex-wrap">
             {user && (

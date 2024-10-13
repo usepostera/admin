@@ -54,22 +54,23 @@ export const useForm = <T extends object>(
     };
 
   const onChangeText = useCallback(
-    (name: keyof T) => (value: string | number | Date | boolean | null) => {
-      setForm((prev) => ({ ...prev, [name]: value }));
+    (name: keyof T) =>
+      (value: string | number | Date | boolean | File | null) => {
+        setForm((prev) => ({ ...prev, [name]: value }));
 
-      const validator = validators[name];
+        const validator = validators[name];
 
-      const error = validator ? validator.validate(value, form) : null;
+        const error = validator ? validator.validate(value, form) : null;
 
-      if (error) {
-        setFormErrors((prev) => ({
-          ...prev,
-          [name]: error,
-        }));
-      } else {
-        setFormErrors((prev) => ({ ...prev, [name]: null }));
-      }
-    },
+        if (error) {
+          setFormErrors((prev) => ({
+            ...prev,
+            [name]: error,
+          }));
+        } else {
+          setFormErrors((prev) => ({ ...prev, [name]: null }));
+        }
+      },
     [form, validators]
   );
 

@@ -7,9 +7,14 @@ export class FormFieldValidator<T, FormType extends object>
   implements IFormFieldValidator<T, FormType>
 {
   private rules: TValidatorRule<FormType> | TValidatorRule<FormType>[];
+  private isOptional: boolean;
 
-  constructor(rules: TValidatorRule<FormType> | TValidatorRule<FormType>[]) {
+  constructor(
+    rules: TValidatorRule<FormType> | TValidatorRule<FormType>[],
+    isOptional = false
+  ) {
     this.rules = rules;
+    this.isOptional = isOptional;
   }
 
   private runCheck(
@@ -17,6 +22,13 @@ export class FormFieldValidator<T, FormType extends object>
     value: T,
     form: FormType
   ): string | null {
+    if (
+      this.isOptional &&
+      (value === null || value === "" || typeof value === "undefined")
+    ) {
+      return null;
+    }
+
     switch (rule.rule) {
       case "match":
         if (typeof value !== "string") {

@@ -36,7 +36,7 @@ export const InfiniteScroll = <T,>({
   );
 
   return (
-    <div className="overflow-auto max-h-screen">
+    <div className="overflow-auto w-full">
       <div className="space-y-4">
         {items.map((item, index) => {
           if (index === items.length - 1) {

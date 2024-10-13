@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import PickupRequestPage from "./pages/PickupRequest";
 import PickupRequestDetailPage from "./pages/PickupRequestDetail";
 import NotificationPage from "./pages/Notification";
+import VolunteerPage from "./pages/Volunteer";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
             <Route path="/notifications" element={<NotificationPage />} />
             <Route path="/pickups" element={<PickupRequestPage />} />
             <Route path="/pickups/:id" element={<PickupRequestDetailPage />} />
+            <Route path="/volunteer" element={<VolunteerPage />} />
+            <Route path="/volunteer/:id" element={<VolunteerPage />} />
           </Route>
 
           <Route element={<AuthWrapper />}>
