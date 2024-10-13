@@ -29,6 +29,7 @@ const PickupRequestDetail: React.FC = () => {
     const result = await trigger(id, date);
 
     if (result) {
+      toast.success("Pickup accepted");
       reloadPickup(result);
     }
   }, [date, id, reloadPickup, trigger]);

@@ -6,6 +6,7 @@ import { initializeDashboardMetrics } from "../store/dashboardSlice";
 
 export const useDashboard = () => {
   const dispatch = useAppDispatch();
+  const initialized = useAppSelector((state) => state.dashboard.isInitialzed);
   const metrics = useAppSelector((state) => state.dashboard.data);
 
   const { getDashboardMetrics } = useDashboardService();
@@ -21,7 +22,7 @@ export const useDashboard = () => {
 
   useEffect(() => {
     httpFetchMetrics();
-  }, [httpFetchMetrics]);
+  }, [initialized, httpFetchMetrics]);
 
-  return { loading, metrics };
+  return { loading, metrics, refresh: httpFetchMetrics };
 };
