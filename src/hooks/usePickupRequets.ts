@@ -3,7 +3,7 @@ import { useRequestHandler } from "./useRequestHandler";
 import { usePickupService } from "../services/pickup";
 import { TPickupRequest } from "../@types";
 
-export const usePickupRequets = (id: string | undefined) => {
+export const usePickupRequets = (id?: string) => {
   const [totalPages, setTotalPages] = useState(1);
   const [pickups, setPickups] = useState<TPickupRequest[]>([]);
 
