@@ -149,4 +149,32 @@ export type TVolunteerEvent = {
   endTime: string;
   organizer: string;
   mapLink?: string;
+  user: {
+    name: string;
+    email: string;
+  };
+};
+
+export type AddressFeature = {
+  type: "Feature";
+  geometry: {
+    type: "Point";
+    coordinates: [number, number]; // [longitude, latitude]
+  };
+  properties: {
+    osm_id: number;
+    country: string;
+    city: string;
+    countrycode: string;
+    postcode: string;
+    county: string;
+    type: string;
+    osm_type: string;
+    osm_key: string;
+    housenumber: string;
+    street: string;
+    osm_value: string;
+    name: string;
+    state: string;
+  };
 };

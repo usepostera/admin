@@ -50,5 +50,12 @@ export const useVolunteerService = () => {
     [axiosInstance]
   );
 
-  return { createEvent, getEvents };
+  const getEvent = useCallback(
+    async (id: string): Promise<TVolunteerEvent> => {
+      return (await axiosInstance.get(`/volunteer/${id}`)).data;
+    },
+    [axiosInstance]
+  );
+
+  return { createEvent, getEvents, getEvent };
 };
