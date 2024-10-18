@@ -149,6 +149,7 @@ export type TVolunteerEvent = {
   endTime: string;
   organizer: string;
   mapLink?: string;
+  createdAt: string;
   user: {
     name: string;
     email: string;

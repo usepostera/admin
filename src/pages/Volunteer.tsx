@@ -6,7 +6,6 @@ import Button from "../components/Button";
 import SimpleAnimatedComponent from "../components/SimpleAnimatedComponent";
 import { useVolunteerEvents } from "../hooks/useVolunteerEvents";
 import { useNavigate, useParams } from "react-router-dom";
-import VolunteerEventDetail from "../components/VolunteerEventDetail";
 
 const Volunteer: React.FC = () => {
   const navigate = useNavigate();
@@ -53,7 +52,7 @@ const Volunteer: React.FC = () => {
 
       <div className="flex-1">
         {isCreateOpen && <CreateVolunteerEvent onComplete={closeCreate} />}
-        {!isCreateOpen && id && <VolunteerEventDetail id={id} />}
+        {/* {!isCreateOpen && id && <VolunteerEventDetail id={id} />} */}
       </div>
     </div>
   );
