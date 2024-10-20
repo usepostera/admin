@@ -3,10 +3,11 @@ import RippleEffect from "../Ripple";
 import DocUploadIcon from "../../assets/svgs/document-upload.svg";
 import toast from "react-hot-toast";
 import { TValidatorError } from "../../@types";
+import { baseURL } from "../../lib/axiosInstance";
 
 type ImageInputProps = {
   label: string;
-  image: File | null;
+  image: File | string | null;
   onSelectImage: (file: File | null) => void;
   error?: TValidatorError | null;
   maxSizeMB?: number;
@@ -64,7 +65,11 @@ export const ImageInput: React.FC<ImageInputProps> = (props) => {
       >
         {image ? (
           <img
-            src={URL.createObjectURL(image)}
+            src={
+              typeof image === "string"
+                ? `${baseURL}/${image}`
+                : URL.createObjectURL(image)
+            }
             alt="Selected image"
             className="object-cover h-full w-full"
           />

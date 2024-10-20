@@ -22,6 +22,17 @@ export type VolunteerInput = {
   image: File | null;
 };
 
+export type TVolunteerEvent = VolunteerInput & {
+  _id: string;
+  image: string;
+  createdAt: string;
+  participantIds: string[];
+  user: {
+    name: string;
+    email: string;
+  };
+};
+
 export interface IFormFieldValidator<T, FormType extends object> {
   validate: (value: T, form: FormType) => TValidatorError;
 }
@@ -134,26 +145,6 @@ export type TNotification = {
   refId: string | null;
   createdAt: string;
   action_complete: boolean;
-};
-
-export type TVolunteerEvent = {
-  _id: string;
-  image: string;
-  title: string;
-  limit?: number | "";
-  address_line1: string;
-  city: string;
-  state: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  organizer: string;
-  mapLink?: string;
-  createdAt: string;
-  user: {
-    name: string;
-    email: string;
-  };
 };
 
 export type AddressFeature = {

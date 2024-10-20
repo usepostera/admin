@@ -1,7 +1,7 @@
-import React, { FormEvent, useCallback, useEffect } from "react";
+import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import SimpleAnimatedComponent from "./SimpleAnimatedComponent";
 import Inputs from "./Input";
-import { VolunteerInput, Validator } from "../@types";
+import { VolunteerInput, Validator, TVolunteerEvent } from "../@types";
 
 import { useForm } from "../hooks/useForm";
 import {
@@ -13,6 +13,7 @@ import Button from "./Button";
 import { useRequestHandler } from "../hooks/useRequestHandler";
 import { useVolunteerService } from "../services/volunteer";
 import toast from "react-hot-toast";
+import Loader from "./Loader";
 
 const initialData: VolunteerInput = {
   address_line1: "",
@@ -70,23 +71,51 @@ const validators: Validator<VolunteerInput> = {
 
 type Props = {
   onComplete?: VoidFunction;
+  id?: string;
 };
 
 const CreateVolunteerEvent: React.FC<Props> = (props) => {
-  const { onComplete } = props;
+  const { onComplete, id } = props;
+
+  const [event, setEvent] = useState<TVolunteerEvent | null>();
+  const { getEvent } = useVolunteerService();
+  const { trigger: triggerGetEvent, loading: loadingEvent } =
+    useRequestHandler(getEvent);
+
+  useEffect(() => {
+    const run = async (eventId: string) => {
+      const result = await triggerGetEvent(eventId);
+      if (result) {
+        setEvent(result);
+      }
+    };
+
+    if (id) {
+      run(id);
+    }
+  }, [id, triggerGetEvent]);
 
   const { form, formErrors, reset, onChange, onChangeText, validate } =
     useForm<VolunteerInput>(initialData, validators);
 
-  const { createEvent } = useVolunteerService();
+  const { createEvent, updateEvent } = useVolunteerService();
   const { trigger, loading } = useRequestHandler(createEvent);
+  const { trigger: triggerUpdate, loading: updating } =
+    useRequestHandler(updateEvent);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
 
       if (validate()) {
-        const result = await trigger(form);
+        let result;
+
+        if (id) {
+          result = await triggerUpdate(form, id);
+        } else {
+          result = await trigger(form);
+        }
+
         if (result) {
           if (onComplete) {
             onComplete();
@@ -95,12 +124,38 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
         }
       }
     },
-    [form, onComplete, trigger, validate]
+    [form, id, onComplete, trigger, triggerUpdate, validate]
   );
 
   useEffect(() => {
     return reset;
   }, [reset]);
+
+  useEffect(() => {
+    if (event) {
+      Object.entries(event).forEach(([key, value]) => {
+        if (typeof value !== "object") {
+          if (typeof value === "string" || typeof value === "number") {
+            if (key === "date") {
+              onChangeText("date")(value.toString().split("T")[0]);
+            } else if (key === "limit" && value === 0) {
+              onChangeText("limit")("");
+            } else {
+              onChangeText(key as keyof VolunteerInput)(value);
+            }
+          }
+        } else if (!Array.isArray(value) && key === "user") {
+          onChangeText("contact_name")(value.name);
+          onChangeText("contact_email")(value.email);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event]);
+
+  if (loadingEvent) {
+    return <Loader size={20} />;
+  }
 
   return (
     <SimpleAnimatedComponent>
@@ -109,7 +164,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
         onSubmit={handleSubmit}
       >
         <h3 className="text-[20px] leading-[24.38px] font-semibold">
-          Add new event
+          {event ? "Update event" : "Add new event"}
         </h3>
 
         <div className="w-full space-y-4">
@@ -119,7 +174,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.title}
             onChange={onChange("title")}
             error={formErrors.title}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <div className="flex flex-col gap-4 md:!flex-row w-full">
@@ -130,7 +185,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
                 value={form.address_line1}
                 onChange={onChange("address_line1")}
                 error={formErrors.address_line1}
-                readOnly={loading}
+                readOnly={loading || updating}
               />
             </div>
 
@@ -141,7 +196,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
                 value={form.city}
                 onChange={onChange("city")}
                 error={formErrors.city}
-                readOnly={loading}
+                readOnly={loading || updating}
               />
             </div>
           </div>
@@ -152,7 +207,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.state}
             onChange={onChange("state")}
             error={formErrors.state}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <Inputs.TextV2
@@ -161,7 +216,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.mapLink}
             onChange={onChange("mapLink")}
             error={formErrors.mapLink}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <Inputs.TextV2
@@ -170,7 +225,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.organizer}
             onChange={onChange("organizer")}
             error={formErrors.organizer}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <Inputs.TextV2
@@ -179,7 +234,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.date}
             onChange={onChange("date")}
             error={formErrors.date}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <div className="flex flex-row gap-4">
@@ -190,7 +245,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
                 value={form.startTime}
                 onChange={onChange("startTime")}
                 error={formErrors.startTime}
-                readOnly={loading}
+                readOnly={loading || updating}
               />
             </div>
 
@@ -201,7 +256,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
                 value={form.endTime}
                 onChange={onChange("endTime")}
                 error={formErrors.endTime}
-                readOnly={loading}
+                readOnly={loading || updating}
               />
             </div>
           </div>
@@ -211,7 +266,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             image={form.image}
             onSelectImage={onChangeText("image")}
             error={formErrors.image}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <Inputs.TextV2
@@ -221,7 +276,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.limit}
             onChange={onChange("limit")}
             error={formErrors.limit}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <h3 className="font-medium text-black text-[16px] leading-[22px]">
@@ -233,7 +288,7 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.contact_name}
             onChange={onChange("contact_name")}
             error={formErrors.contact_name}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
 
           <Inputs.TextV2
@@ -241,17 +296,21 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
             value={form.contact_email}
             onChange={onChange("contact_email")}
             error={formErrors.contact_email}
-            readOnly={loading}
+            readOnly={loading || updating}
           />
         </div>
 
-        <Button.Contained label="Save" type="submit" loading={loading} />
+        <Button.Contained
+          label="Save"
+          type="submit"
+          loading={loading || updating}
+        />
 
         <Button.Outlined
           label="Cancel"
           type="button"
           onClick={onComplete ? () => onComplete() : undefined}
-          disabled={loading}
+          disabled={loading || updating}
         />
       </form>
     </SimpleAnimatedComponent>

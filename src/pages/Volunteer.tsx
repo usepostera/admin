@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import SimpleAnimatedComponent from "../components/SimpleAnimatedComponent";
 import { useVolunteerEvents } from "../hooks/useVolunteerEvents";
 import { useNavigate, useParams } from "react-router-dom";
+import GoBack from "../components/GoBack";
 
 const Volunteer: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +20,11 @@ const Volunteer: React.FC = () => {
   const closeCreate = useCallback(() => {
     setIsCreateOpen(false);
     reload();
-  }, [reload]);
+
+    if (id) {
+      navigate(-1);
+    }
+  }, [id, navigate, reload]);
 
   const onSelect = useCallback(
     (id: string) => {
@@ -31,6 +36,12 @@ const Volunteer: React.FC = () => {
   return (
     <div className="p-4 md:!p-8 flex flex-col md:!flex-row gap-8">
       <div className="flex-1 md:max-w-[400px]">
+        {id && (
+          <div className="">
+            <GoBack />
+          </div>
+        )}
+
         {!isCreateOpen && !id && (
           <SimpleAnimatedComponent>
             <Button.Contained
@@ -52,7 +63,9 @@ const Volunteer: React.FC = () => {
 
       <div className="flex-1">
         {isCreateOpen && <CreateVolunteerEvent onComplete={closeCreate} />}
-        {/* {!isCreateOpen && id && <VolunteerEventDetail id={id} />} */}
+        {!isCreateOpen && id && (
+          <CreateVolunteerEvent id={id} onComplete={closeCreate} />
+        )}
       </div>
     </div>
   );

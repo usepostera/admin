@@ -36,6 +36,34 @@ export const useVolunteerService = () => {
     [axiosInstance]
   );
 
+  const updateEvent = useCallback(
+    async (data: VolunteerInput, id: string): Promise<TVolunteerEvent> => {
+      const payload = new FormData();
+
+      // eslint-disable-next-line prefer-const
+      for (let [key, value] of Object.entries(data)) {
+        if (value === null || typeof value === "undefined") {
+          continue;
+        }
+
+        if (typeof value === "number") {
+          value = value.toString();
+        }
+
+        payload.append(key, value);
+      }
+
+      payload.append("id", id);
+
+      return (
+        await axiosInstance.putForm("/volunteer", payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+      ).data;
+    },
+    [axiosInstance]
+  );
+
   const getEvents = useCallback(
     async (
       page = 1
@@ -57,5 +85,5 @@ export const useVolunteerService = () => {
     [axiosInstance]
   );
 
-  return { createEvent, getEvents, getEvent };
+  return { createEvent, getEvents, getEvent, updateEvent };
 };
