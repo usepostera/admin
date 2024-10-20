@@ -1,9 +1,16 @@
 import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import SimpleAnimatedComponent from "./SimpleAnimatedComponent";
 import Inputs from "./Input";
-import { VolunteerInput, Validator, TVolunteerEvent } from "../@types";
+import {
+  VolunteerInput,
+  Validator,
+  TVolunteerEvent,
+  ConfirmDeleteData,
+} from "../@types";
 
 import { useForm } from "../hooks/useForm";
+import { MdDelete } from "react-icons/md";
+
 import {
   emailValidator,
   emptyValidator,
@@ -14,6 +21,8 @@ import { useRequestHandler } from "../hooks/useRequestHandler";
 import { useVolunteerService } from "../services/volunteer";
 import toast from "react-hot-toast";
 import Loader from "./Loader";
+import RippleEffect from "./Ripple";
+import ConfirmDelete from "./ConfirmDelete";
 
 const initialData: VolunteerInput = {
   address_line1: "",
@@ -77,6 +86,9 @@ type Props = {
 const CreateVolunteerEvent: React.FC<Props> = (props) => {
   const { onComplete, id } = props;
 
+  const [isDeleteOpen, setIsDeleteOpen] = useState<ConfirmDeleteData | null>(
+    null
+  );
   const [event, setEvent] = useState<TVolunteerEvent | null>();
   const { getEvent } = useVolunteerService();
   const { trigger: triggerGetEvent, loading: loadingEvent } =
@@ -98,10 +110,13 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
   const { form, formErrors, reset, onChange, onChangeText, validate } =
     useForm<VolunteerInput>(initialData, validators);
 
-  const { createEvent, updateEvent } = useVolunteerService();
+  const { createEvent, updateEvent, deleteEvent } = useVolunteerService();
   const { trigger, loading } = useRequestHandler(createEvent);
   const { trigger: triggerUpdate, loading: updating } =
     useRequestHandler(updateEvent);
+
+  const { trigger: triggerDelete, loading: deleting } =
+    useRequestHandler(deleteEvent);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -153,167 +168,212 @@ const CreateVolunteerEvent: React.FC<Props> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
 
+  const handleDelete = useCallback(() => {
+    if (!event) {
+      return;
+    }
+    setIsDeleteOpen({
+      message: `Confirm event - ${event?.title} for deletion`,
+    });
+  }, [event]);
+
+  const onSubmitDeleteConfirmation = useCallback(
+    (shouldDelete: boolean) => {
+      if (shouldDelete && id) {
+        triggerDelete(id).then((isDone) => {
+          if (isDone) {
+            setIsDeleteOpen(null);
+            toast.success("Success!");
+
+            if (onComplete) onComplete();
+          }
+        });
+      } else {
+        setIsDeleteOpen(null);
+      }
+    },
+    [id, onComplete, triggerDelete]
+  );
+
   if (loadingEvent) {
     return <Loader size={20} />;
   }
 
   return (
-    <SimpleAnimatedComponent>
-      <form
-        className="flex flex-col items-start gap-6 font-montserrat md:max-w-[380px]"
-        onSubmit={handleSubmit}
-      >
-        <h3 className="text-[20px] leading-[24.38px] font-semibold">
-          {event ? "Update event" : "Add new event"}
-        </h3>
+    <>
+      <ConfirmDelete
+        isOpen={Boolean(isDeleteOpen)}
+        message={isDeleteOpen?.message ?? ""}
+        onSubmit={onSubmitDeleteConfirmation}
+        loading={deleting}
+      />
 
-        <div className="w-full space-y-4">
-          <Inputs.TextV2
-            label="Event name"
-            placeholder="Base Africa Earth Day"
-            value={form.title}
-            onChange={onChange("title")}
-            error={formErrors.title}
-            readOnly={loading || updating}
-          />
+      <SimpleAnimatedComponent>
+        <form
+          className="flex flex-col items-start gap-6 font-montserrat md:max-w-[380px]"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex flex-row items-center justify-between w-full">
+            <h3 className="text-[20px] leading-[24.38px] font-semibold">
+              {event ? "Update event" : "Add new event"}
+            </h3>
 
-          <div className="flex flex-col gap-4 md:!flex-row w-full">
-            <div className="flex-1">
-              <Inputs.TextV2
-                label="Address Line 1"
-                placeholder="44, Commercial Ave."
-                value={form.address_line1}
-                onChange={onChange("address_line1")}
-                error={formErrors.address_line1}
-                readOnly={loading || updating}
-              />
-            </div>
-
-            <div className="flex-1">
-              <Inputs.TextV2
-                label="City"
-                placeholder="Ikoyi"
-                value={form.city}
-                onChange={onChange("city")}
-                error={formErrors.city}
-                readOnly={loading || updating}
-              />
-            </div>
+            {event && (
+              <RippleEffect className="p-2 rounded-full" onClick={handleDelete}>
+                <MdDelete size={24} className="text-danger" />
+              </RippleEffect>
+            )}
           </div>
 
-          <Inputs.TextV2
-            label="State"
-            placeholder="Lagos"
-            value={form.state}
-            onChange={onChange("state")}
-            error={formErrors.state}
-            readOnly={loading || updating}
-          />
+          <div className="w-full space-y-4">
+            <Inputs.TextV2
+              label="Event name"
+              placeholder="Base Africa Earth Day"
+              value={form.title}
+              onChange={onChange("title")}
+              error={formErrors.title}
+              readOnly={loading || updating || deleting}
+            />
 
-          <Inputs.TextV2
-            label="Map link (Optional)"
-            placeholder="https://maps.app.goo.gl/6XyYEB42cUKaPH8h9"
-            value={form.mapLink}
-            onChange={onChange("mapLink")}
-            error={formErrors.mapLink}
-            readOnly={loading || updating}
-          />
+            <div className="flex flex-col gap-4 md:!flex-row w-full">
+              <div className="flex-1">
+                <Inputs.TextV2
+                  label="Address Line 1"
+                  placeholder="44, Commercial Ave."
+                  value={form.address_line1}
+                  onChange={onChange("address_line1")}
+                  error={formErrors.address_line1}
+                  readOnly={loading || updating || deleting}
+                />
+              </div>
 
-          <Inputs.TextV2
-            label="Organizer"
-            placeholder="Blockchain Club Unilag"
-            value={form.organizer}
-            onChange={onChange("organizer")}
-            error={formErrors.organizer}
-            readOnly={loading || updating}
-          />
-
-          <Inputs.TextV2
-            label="Date"
-            type="date"
-            value={form.date}
-            onChange={onChange("date")}
-            error={formErrors.date}
-            readOnly={loading || updating}
-          />
-
-          <div className="flex flex-row gap-4">
-            <div className="flex-1">
-              <Inputs.TextV2
-                label="Start time"
-                type="time"
-                value={form.startTime}
-                onChange={onChange("startTime")}
-                error={formErrors.startTime}
-                readOnly={loading || updating}
-              />
+              <div className="flex-1">
+                <Inputs.TextV2
+                  label="City"
+                  placeholder="Ikoyi"
+                  value={form.city}
+                  onChange={onChange("city")}
+                  error={formErrors.city}
+                  readOnly={loading || updating || deleting}
+                />
+              </div>
             </div>
 
-            <div className="flex-1">
-              <Inputs.TextV2
-                label="End time"
-                type="time"
-                value={form.endTime}
-                onChange={onChange("endTime")}
-                error={formErrors.endTime}
-                readOnly={loading || updating}
-              />
+            <Inputs.TextV2
+              label="State"
+              placeholder="Lagos"
+              value={form.state}
+              onChange={onChange("state")}
+              error={formErrors.state}
+              readOnly={loading || updating || deleting}
+            />
+
+            <Inputs.TextV2
+              label="Map link (Optional)"
+              placeholder="https://maps.app.goo.gl/6XyYEB42cUKaPH8h9"
+              value={form.mapLink}
+              onChange={onChange("mapLink")}
+              error={formErrors.mapLink}
+              readOnly={loading || updating || deleting}
+            />
+
+            <Inputs.TextV2
+              label="Organizer"
+              placeholder="Blockchain Club Unilag"
+              value={form.organizer}
+              onChange={onChange("organizer")}
+              error={formErrors.organizer}
+              readOnly={loading || updating || deleting}
+            />
+
+            <Inputs.TextV2
+              label="Date"
+              type="date"
+              value={form.date}
+              onChange={onChange("date")}
+              error={formErrors.date}
+              readOnly={loading || updating || deleting}
+            />
+
+            <div className="flex flex-row gap-4">
+              <div className="flex-1">
+                <Inputs.TextV2
+                  label="Start time"
+                  type="time"
+                  value={form.startTime}
+                  onChange={onChange("startTime")}
+                  error={formErrors.startTime}
+                  readOnly={loading || updating || deleting}
+                />
+              </div>
+
+              <div className="flex-1">
+                <Inputs.TextV2
+                  label="End time"
+                  type="time"
+                  value={form.endTime}
+                  onChange={onChange("endTime")}
+                  error={formErrors.endTime}
+                  readOnly={loading || updating || deleting}
+                />
+              </div>
             </div>
+
+            <Inputs.Image
+              label="Upload event image"
+              image={form.image}
+              onSelectImage={onChangeText("image")}
+              error={formErrors.image}
+              readOnly={loading || updating || deleting}
+            />
+
+            <Inputs.TextV2
+              label="Participant limit (Optional)"
+              placeholder="100"
+              type="number"
+              value={form.limit}
+              onChange={onChange("limit")}
+              error={formErrors.limit}
+              readOnly={loading || updating || deleting}
+            />
+
+            <h3 className="font-medium text-black text-[16px] leading-[22px]">
+              Contact details
+            </h3>
+
+            <Inputs.TextV2
+              label="Full name"
+              value={form.contact_name}
+              onChange={onChange("contact_name")}
+              error={formErrors.contact_name}
+              readOnly={loading || updating || deleting}
+            />
+
+            <Inputs.TextV2
+              label="Email"
+              value={form.contact_email}
+              onChange={onChange("contact_email")}
+              error={formErrors.contact_email}
+              readOnly={loading || updating || deleting}
+            />
           </div>
 
-          <Inputs.Image
-            label="Upload event image"
-            image={form.image}
-            onSelectImage={onChangeText("image")}
-            error={formErrors.image}
-            readOnly={loading || updating}
+          <Button.Contained
+            label="Save"
+            type="submit"
+            loading={loading || updating}
+            disabled={deleting}
           />
 
-          <Inputs.TextV2
-            label="Participant limit (Optional)"
-            placeholder="100"
-            type="number"
-            value={form.limit}
-            onChange={onChange("limit")}
-            error={formErrors.limit}
-            readOnly={loading || updating}
+          <Button.Outlined
+            label="Cancel"
+            type="button"
+            onClick={onComplete ? () => onComplete() : undefined}
+            disabled={loading || updating || deleting}
           />
-
-          <h3 className="font-medium text-black text-[16px] leading-[22px]">
-            Contact details
-          </h3>
-
-          <Inputs.TextV2
-            label="Full name"
-            value={form.contact_name}
-            onChange={onChange("contact_name")}
-            error={formErrors.contact_name}
-            readOnly={loading || updating}
-          />
-
-          <Inputs.TextV2
-            label="Email"
-            value={form.contact_email}
-            onChange={onChange("contact_email")}
-            error={formErrors.contact_email}
-            readOnly={loading || updating}
-          />
-        </div>
-
-        <Button.Contained
-          label="Save"
-          type="submit"
-          loading={loading || updating}
-        />
-
-        <Button.Outlined
-          label="Cancel"
-          type="button"
-          onClick={onComplete ? () => onComplete() : undefined}
-          disabled={loading || updating}
-        />
-      </form>
-    </SimpleAnimatedComponent>
+        </form>
+      </SimpleAnimatedComponent>
+    </>
   );
 };
 

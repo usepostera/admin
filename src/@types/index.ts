@@ -33,6 +33,10 @@ export type TVolunteerEvent = VolunteerInput & {
   };
 };
 
+export type ConfirmDeleteData = {
+  message: string;
+};
+
 export interface IFormFieldValidator<T, FormType extends object> {
   validate: (value: T, form: FormType) => TValidatorError;
 }

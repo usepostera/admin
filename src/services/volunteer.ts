@@ -85,5 +85,11 @@ export const useVolunteerService = () => {
     [axiosInstance]
   );
 
-  return { createEvent, getEvents, getEvent, updateEvent };
+  const deleteEvent = useCallback(
+    async (id: string): Promise<boolean> => {
+      return (await axiosInstance.delete(`/volunteer/${id}`)).data;
+    },
+    [axiosInstance]
+  );
+  return { createEvent, getEvents, getEvent, updateEvent, deleteEvent };
 };
